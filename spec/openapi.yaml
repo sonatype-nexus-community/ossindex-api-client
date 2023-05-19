@@ -1,0 +1,194 @@
+openapi: 3.0.1
+info:
+  title: OSS Index REST API
+  description: |
+    This documents the available APIs for [Sonatype's OSS Index'](https://ossindex.sonatype.org).
+  contact:
+    name: Sonatype Community Maintainers
+    url: https://github.com/sonatype-nexus-community
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: "2023.05"
+servers:
+  - url: /
+tags:
+  - name: Component vulnerability reports
+  - name: Version
+paths:
+  /api/v3/component-report:
+    post:
+      tags:
+        - Component vulnerability reports
+      summary: Request vulnerability reports for components
+      operationId: post
+      requestBody:
+        content:
+          application/vnd.ossindex.component-report-request.v1+json:
+            schema:
+              $ref: '#/components/schemas/ComponentReportRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComponentReportRequest'
+        required: false
+      responses:
+        '200':
+          description: Vulnerability report for components
+          content: {}
+        '400':
+          description: Missing coordinates version
+          content: {}
+        '429':
+          description: Too many requests
+          content: {}
+      security:
+        - basicAuth: []
+        - apiToken: []
+      x-codegen-request-body-name: body
+  /api/v3/authorized/component-report:
+    post:
+      tags:
+        - Component vulnerability reports
+      summary: Request vulnerability reports for components
+      operationId: post_1
+      requestBody:
+        content:
+          application/vnd.ossindex.component-report-request.v1+json:
+            schema:
+              $ref: '#/components/schemas/ComponentReportRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComponentReportRequest'
+        required: false
+      responses:
+        '200':
+          description: Vulnerability report for components
+          content: {}
+        '400':
+          description: Missing coordinates version
+          content: {}
+        '429':
+          description: Too many requests
+          content: {}
+      security:
+        - basicAuth: []
+        - apiToken: []
+      x-codegen-request-body-name: body
+  /api/v3/version:
+    get:
+      tags:
+        - Version
+      summary: Get service version information
+      operationId: get
+      responses:
+        '200':
+          description: Version information
+          content: {}
+        '429':
+          description: Too many requests
+          content: {}
+components:
+  schemas:
+    ComponentReport:
+      type: object
+      properties:
+        coordinates:
+          type: string
+          description: Component coordinates as package-url
+          format: uri
+        description:
+          type: string
+          description: Component description
+        reference:
+          type: string
+          description: Component details reference
+          format: uri
+        vulnerabilities:
+          type: array
+          description: Vulnerabilities recorded for component
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/ComponentReportVulnerability'
+      description: Component vulnerability report
+    ComponentReportVulnerability:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public identifier
+        displayName:
+          type: string
+          description: Display name
+        title:
+          type: string
+          description: Vulnerability title
+        description:
+          type: string
+          description: Vulnerability description
+        cvssScore:
+          type: number
+          description: CVSS score
+          format: float
+        cvssVector:
+          type: string
+          description: CVSS vector
+        cwe:
+          type: string
+          description: CWE
+        cve:
+          type: string
+          description: CVE
+        reference:
+          type: string
+          description: Vulnerability details reference
+          format: uri
+        versionRanges:
+          type: array
+          description: Affected version ranges
+          items:
+            type: string
+        externalReferences:
+          type: array
+          description: External references related to the vulnerability
+          items:
+            type: string
+            format: uri
+      description: Component vulnerability
+    ComponentReportRequest:
+      required:
+        - coordinates
+      type: object
+      properties:
+        coordinates:
+          type: array
+          description: One or more component coordinates as package-url
+          xml:
+            wrapped: true
+          items:
+            type: string
+            format: uri
+            xml:
+              name: coordinates
+      description: Component vulnerability report request
+    Version:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version
+        buildTimestamp:
+          type: string
+          description: Build timestamp
+        buildTag:
+          type: string
+          description: Build tag
+        buildNotes:
+          type: string
+          description: Build notes
+      description: Version
+  securitySchemes:
+    apiToken:
+      type: http
+      description: Use email address for the username and API token for the password.
+      scheme: basic

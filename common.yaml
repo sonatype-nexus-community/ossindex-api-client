@@ -1,0 +1,6 @@
+inputSpec: /local/spec/openapi.yaml
+gitUserId: sonatype-nexus-community
+gitRepoId: ossindex-api-client
+
+globalProperties:
+  skipFormModel: false
