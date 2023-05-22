@@ -11,7 +11,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: "2023.05"
 servers:
-  - url: /
+  - url: https://ossindex.sonatype.org
 tags:
   - name: Component vulnerability reports
   - name: Version
@@ -21,7 +21,7 @@ paths:
       tags:
         - Component vulnerability reports
       summary: Request vulnerability reports for components
-      operationId: post
+      operationId: componentReport
       requestBody:
         content:
           application/vnd.ossindex.component-report-request.v1+json:
@@ -34,7 +34,17 @@ paths:
       responses:
         '200':
           description: Vulnerability report for components
-          content: {}
+          content: 
+            application/vnd.ossindex.component-report-request.v1+json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComponentReport"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComponentReport"
         '400':
           description: Missing coordinates version
           content: {}
@@ -42,7 +52,6 @@ paths:
           description: Too many requests
           content: {}
       security:
-        - basicAuth: []
         - apiToken: []
       x-codegen-request-body-name: body
   /api/v3/authorized/component-report:
@@ -50,7 +59,7 @@ paths:
       tags:
         - Component vulnerability reports
       summary: Request vulnerability reports for components
-      operationId: post_1
+      operationId: authorizedComponentReport
       requestBody:
         content:
           application/vnd.ossindex.component-report-request.v1+json:
@@ -63,7 +72,17 @@ paths:
       responses:
         '200':
           description: Vulnerability report for components
-          content: {}
+          content:
+            application/vnd.ossindex.component-report-request.v1+json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComponentReport"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComponentReport"
         '400':
           description: Missing coordinates version
           content: {}
@@ -71,7 +90,6 @@ paths:
           description: Too many requests
           content: {}
       security:
-        - basicAuth: []
         - apiToken: []
       x-codegen-request-body-name: body
   /api/v3/version:
@@ -79,11 +97,17 @@ paths:
       tags:
         - Version
       summary: Get service version information
-      operationId: get
+      operationId: getOssIndexVersion
       responses:
         '200':
           description: Version information
-          content: {}
+          content:
+            application/vnd.ossindex.component-report-request.v1+json:
+              schema:
+                $ref: '#/components/schemas/Version'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
         '429':
           description: Too many requests
           content: {}

@@ -42,7 +42,9 @@ This repository produces generated API Clients in various languages and framewor
 
 ### Additional Changes to OpenAPI Schema prior to Generation
 
-*None*
+- Removal of references to `basicAuth` security scheme which is not defined and unused given `apiToken` security scheme
+- Added schema for response to `/api/v3/component-report` and `/api/v3/authorized/component-report` APIs
+- Added schema for response to `/api/v3/version`
 
 
 ## Getting the latest OpenAPI Schema
