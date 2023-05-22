@@ -115,6 +115,10 @@ components:
   schemas:
     ComponentReport:
       type: object
+      required:
+        - coordinates
+        - reference
+        - vulnerabilities
       properties:
         coordinates:
           type: string
