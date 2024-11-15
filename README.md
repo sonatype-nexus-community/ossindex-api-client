@@ -18,7 +18,7 @@
 
 # OSS Index API Client(s)
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/ossindex-api-client/tree/main.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/ossindex-api-client/tree/main)
+[![CI](https://github.com/sonatype-nexus-community/ossindex-api-client/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/sonatype-nexus-community/ossindex-api-client/actions/workflows/build.yaml)
 [![GitHub license](https://img.shields.io/github/license/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/issues)
 [![GitHub forks](https://img.shields.io/github/forks/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/network)
@@ -30,9 +30,10 @@ This repository produces generated API Clients in various languages and framewor
 
 ## Supported Languages & Frameworks
 
-| Language / Framework | OSS Index REST API Version (Date) | Public Package Link |
+| Language / Framework | Since | Public Package Link |
 | -------------------- | ---------------------- | ------------------- |
-| Typescript (fetch)   | 2023.05 | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fossindex-api-client)](https://www.npmjs.com/package/@sonatype/ossindex-api-client) |
+| Python | 2025-11-15 | [![PyPI - Version](https://img.shields.io/pypi/v/ossindex-api-client)](https://pypi.org/project/ossindex-api-client/) | 
+| Typescript (fetch)   | 2023-05-22 | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fossindex-api-client)](https://www.npmjs.com/package/@sonatype/ossindex-api-client) |
 
 ## Known Issues
 
