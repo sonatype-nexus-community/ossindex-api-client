@@ -18,7 +18,7 @@
 
 # OSS Index API Client(s)
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/ossindex-api-client/tree/main.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/ossindex-api-client/tree/main)
+[![CI](https://github.com/sonatype-nexus-community/ossindex-api-client/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/sonatype-nexus-community/ossindex-api-client/actions/workflows/build.yaml)
 [![GitHub license](https://img.shields.io/github/license/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/issues)
 [![GitHub forks](https://img.shields.io/github/forks/sonatype-nexus-community/ossindex-api-client)](https://github.com/sonatype-nexus-community/ossindex-api-client/network)
@@ -26,13 +26,14 @@
 
 ----
 
-This repository produces generated API Clients in various languages and frameworks for use by Customers and other projects.
+This repository produces generated API Clients in various languages and frameworks for use by Customers, other projects and interested parties.
 
 ## Supported Languages & Frameworks
 
-| Language / Framework | OSS Index REST API Version (Date) | Public Package Link |
+| Language / Framework | Since | Public Package Link |
 | -------------------- | ---------------------- | ------------------- |
-| Typescript (fetch)   | 2023.05 | [NPM](https://www.npmjs.com/package/@sonatype/ossindex-api-client) |
+| Python | 2025-11-15 | [![PyPI - Version](https://img.shields.io/pypi/v/ossindex-api-client)](https://pypi.org/project/ossindex-api-client/) | 
+| Typescript (fetch)   | 2023-05-22 | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fossindex-api-client)](https://www.npmjs.com/package/@sonatype/ossindex-api-client) |
 
 ## Known Issues
 
@@ -40,16 +41,16 @@ This repository produces generated API Clients in various languages and framewor
 
 *None*
 
-### Additional Changes to OpenAPI Schema prior to Generation
-
-- Removal of references to `basicAuth` security scheme which is not defined and unused given `apiToken` security scheme
-- Added schema for response to `/api/v3/component-report` and `/api/v3/authorized/component-report` APIs
-- Added schema for response to `/api/v3/version`
-
-
 ## Getting the latest OpenAPI Schema
 
-Get it from your [OSS Index directly.](https://ossindex.sonatype.org/swagger.json).
+Create a Python Virtual Environment with Poetry and then run:
+
+```
+poetry install
+python update-spec.py
+```
+
+This will download the current Swagger 2.0 specification, convert to OpenAPI 3, add a few tweaks and put it into the `spec` folder.
 
 ## Generation of API Clients
 
@@ -59,14 +60,9 @@ docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli batch --cl
 docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/test -c /local/openapi-config.yaml -v > out.log
 ```
 
-## Changelog
-
-See our [Change Log](./CHANGELOG.md).
-
 ## Releasing
 
-We use [semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to generate releases
-from commits to the `main` branch.
+We use [semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to generate releases from commits to the `main` branch.
 
 For example, to perform a "patch" release, add a commit to `main` with a comment like below. The `fix: ` prefix matters.
 

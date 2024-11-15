@@ -1,0 +1,218 @@
+name: Release API Clients
+
+on:
+    push:
+        tags:
+            - 'v*'
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    OPEN_API_GENERATOR_VERSION: 'v7.9.0'
+    PYTHON_VERSION_DEFAULT: '3.12'
+    POETRY_VERSION: '1.8.1'
+    THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
+
+jobs:
+    generate-library-code:
+        name: Generate Library Code ${{ matrix.language }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                language: ['python', 'typescript']
+        steps:
+            - name: Checkout
+              # see https://github.com/actions/checkout
+              uses: actions/checkout@v4
+
+            - name: Create Output Directory
+              run: mkdir out/${{ matrix.language }}
+
+            - name: Run OpenAPI Generator
+              uses: addnab/docker-run-action@v3
+              with:
+                  image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
+                  options: -v ${{ github.workspace }}:/local
+                  run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
+
+            # - name: Copy our scripts across too
+            #   run: cp *.sh ./out/${{ matrix.language }}
+            
+            - name: Save to Cache
+              uses: actions/cache/save@v4
+              with:
+                  path: out/${{ matrix.language }}
+                  key: '${{ matrix.language }}-${{ github.sha }}'
+
+    # release-go:
+    #     name: Release Go Library
+    #     runs-on: ubuntu-latest
+    #     needs: generate-library-code
+
+    #     steps:
+    #         - name: Setup Go
+    #           uses: actions/setup-go@v5
+    #           with:
+    #               go-version: 1.22
+
+    #         - name: Checkout Go Library Repository
+    #           uses: actions/checkout@v4
+    #           with:
+    #               repository: sonatype-nexus-community/nexus-repo-api-client-go
+    #               ref: main
+    #               token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
+    #               path: out/go
+
+    #         - name: Setup git config
+    #           run: |
+    #               git config --global user.name "GitHub Actions"
+    #               git config --global user.email "<>"
+
+    #         - name: Unstage all existing files
+    #           run: git rm -fr --ignore-unmatch *
+    #           working-directory: out/go
+
+    #         - name: Get generated code from cache
+    #           uses: actions/cache/restore@v4
+    #           with:
+    #               path: out/go
+    #               key: 'go-${{ github.sha }}'
+    #               fail-on-cache-miss: true
+    #         - name: Validate Checked Out Library
+    #           run: ls -lR ${{ github.workspace }}
+              
+    #         - name: Build Go API Client
+    #           run: go build -v ./
+    #           working-directory: out/go
+
+    #         - name: Install test dependencies & run generated tests
+    #           run: |
+    #               go get github.com/stretchr/testify/assert
+    #               go test -v ./test/
+    #           working-directory: out/go
+
+    #         - name: Commit, Tag and Push
+    #           if: ${{ github.ref_type == 'tag' }}
+    #           run: |
+    #               echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
+    #               git add *
+    #               git commit -m "Automated Release v${{ env.THIS_VERSION }}"
+    #               git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
+    #               git push
+    #               git push --tags
+    #           working-directory: out/go
+
+    # release-java-webclient:
+    #     name: Release Java Webclient Library
+    #     runs-on: ubuntu-latest
+    #     needs: generate-library-code
+
+    #     steps:
+    #       - name: Set Java JDK 17 and Maven Central Repository
+    #         uses: actions/setup-java@v4
+    #         with:
+    #           java-version: '17'
+    #           distribution: 'temurin'
+    #           server-id: central
+    #           server-username: MAVEN_USERNAME
+    #           server-password: MAVEN_PASSWORD
+    #           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+    #           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+    #       - name: Set up Maven
+    #         uses: stCarolas/setup-maven@v5
+    #         with:
+    #           maven-version: 3.9.4
+
+    #       - name: Get generated code from cache
+    #         uses: actions/cache/restore@v4
+    #         with:
+    #           path: out/java-webclient
+    #           key: 'java-webclient-${{ github.sha }}'
+    #           fail-on-cache-miss: true
+
+    #       - name: Publish package
+    #         run: |
+    #             ./update-pom.sh pom.xml
+    #             mvn versions:set -DnewVersion=${{ env.THIS_VERSION }}
+    #             mvn deploy --batch-mode -Ppublish-central -Prelease -DskipTests -DskipNexusStagingDeployMojo
+    #         env:
+    #           MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERAME }}
+    #           MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+    #           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    #         working-directory: out/java-webclient
+
+    release-python:
+        name: Release Python Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
+
+            - name: Install poetry
+              # see https://github.com/marketplace/actions/setup-poetry
+              uses: Gr1N/setup-poetry@v9
+              with:
+                  poetry-version: ${{ env.POETRY_VERSION }}
+
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: out/python
+                  key: 'python-${{ github.sha }}'
+                  fail-on-cache-miss: true
+
+            - name: Set Version
+              run: |
+                  poetry version ${{ env.THIS_VERSION }}
+              working-directory: out/python
+
+            - name: Build Python API Client
+              run: poetry build
+              working-directory: out/python
+
+            - name: Publish
+              run: |
+                  poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+                  poetry publish
+              working-directory: out/python
+
+    release-typescript:
+        name: Release Typescript Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: latest
+
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: out/typescript
+                  key: 'typescript-${{ github.sha }}'
+                  fail-on-cache-miss: true
+                  
+            - name: Set Version
+              run: |
+                  npm version ${{ env.THIS_VERSION }}
+              working-directory: out/typescript
+
+            - name: Build Typescript API Client
+              run: npm i && npm run build
+              working-directory: out/typescript
+
+            - name: Publish
+              run: |
+                  npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+                  npm publish --access public
+              working-directory: out/typescript
