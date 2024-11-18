@@ -137,10 +137,14 @@ paths:
           content: &id001
             application/json:
               schema:
-                $ref: '#/components/schemas/ComponentReport'
+                items:
+                  $ref: '#/components/schemas/ComponentReport'
+                type: array
             application/vnd.ossindex.component-report-request.v1+json:
               schema:
-                $ref: '#/components/schemas/ComponentReport'
+                items:
+                  $ref: '#/components/schemas/ComponentReport'
+                type: array
           description: Vulnerability report for components
         '400':
           content: {}

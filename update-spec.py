@@ -73,12 +73,18 @@ json_spec['servers'] = [
 vuln_response = {
     'application/json': {
         'schema': {
-            '$ref': '#/components/schemas/ComponentReport'
+            'type': 'array',
+            'items': {
+                '$ref': '#/components/schemas/ComponentReport'
+            }
         }
     },
     'application/vnd.ossindex.component-report-request.v1+json': {
         'schema': {
-            '$ref': '#/components/schemas/ComponentReport'
+            'type': 'array',
+            'items': {
+                '$ref': '#/components/schemas/ComponentReport'
+            }
         }
     }
 }
