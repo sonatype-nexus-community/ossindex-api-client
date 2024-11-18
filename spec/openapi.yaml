@@ -115,8 +115,9 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://ossindex.sonatype.org/tos
   title: Sonatype OSS Index
-  version: '2024.320'
+  version: '2024.323'
 openapi: 3.0.1
 paths:
   /api/v3/authorized/component-report:
@@ -133,7 +134,13 @@ paths:
         required: false
       responses:
         '200':
-          content: {}
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentReport'
+            application/vnd.ossindex.component-report-request.v1+json:
+              schema:
+                $ref: '#/components/schemas/ComponentReport'
           description: Vulnerability report for components
         '400':
           content: {}
@@ -162,7 +169,7 @@ paths:
         required: false
       responses:
         '200':
-          content: {}
+          content: *id001
           description: Vulnerability report for components
         '400':
           content: {}
@@ -191,7 +198,7 @@ paths:
       tags:
       - Version
 servers:
-- url: /
+- url: https://ossindex.sonatype.org
 tags:
 - name: Component vulnerability reports
 - name: Version
