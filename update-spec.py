@@ -58,8 +58,32 @@ json_spec['info'] = {
         'name': 'Apache 2.0',
         'url': 'http://www.apache.org/licenses/LICENSE-2.0.html'
     },
+    'termsOfService': 'https://ossindex.sonatype.org/tos',
     'version': OSS_INDEX_API_VERSION
 }
+
+print('Injecting correct `servers`')
+json_spec['servers'] = [
+    {
+        'url': 'https://ossindex.sonatype.org'
+    }
+]
+
+# Fix Response Schemas
+vuln_response = {
+    'application/json': {
+        'schema': {
+            '$ref': '#/components/schemas/ComponentReport'
+        }
+    },
+    'application/vnd.ossindex.component-report-request.v1+json': {
+        'schema': {
+            '$ref': '#/components/schemas/ComponentReport'
+        }
+    }
+}
+json_spec['paths']['/api/v3/component-report']['post']['responses']['200']['content'] = vuln_response
+json_spec['paths']['/api/v3/authorized/component-report']['post']['responses']['200']['content'] = vuln_response
 
 # Add `securitySchemes` under `components`
 if 'components' in json_spec and 'securitySchemes' in json_spec['components'] and 'basicAuth' not in \
