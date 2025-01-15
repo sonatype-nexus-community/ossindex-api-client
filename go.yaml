@@ -1,0 +1,7 @@
+'!include': 'common.yaml'
+outputDir: /local/out/go
+generatorName: go
+gitRepoId: ossindex-api-client-go
+additionalProperties:
+  goImportAlias: ossindex
+  packageName: ossindex

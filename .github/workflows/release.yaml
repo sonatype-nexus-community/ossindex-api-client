@@ -11,7 +11,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    OPEN_API_GENERATOR_VERSION: 'v7.9.0'
+    OPEN_API_GENERATOR_VERSION: 'v7.10.0'
     PYTHON_VERSION_DEFAULT: '3.12'
     POETRY_VERSION: '1.8.1'
     THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
@@ -22,7 +22,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                language: ['python', 'typescript']
+                language: ['go', 'python', 'typescript']
         steps:
             - name: Checkout
               # see https://github.com/actions/checkout
@@ -47,63 +47,63 @@ jobs:
                   path: out/${{ matrix.language }}
                   key: '${{ matrix.language }}-${{ github.sha }}'
 
-    # release-go:
-    #     name: Release Go Library
-    #     runs-on: ubuntu-latest
-    #     needs: generate-library-code
+    release-go:
+        name: Release Go Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
 
-    #     steps:
-    #         - name: Setup Go
-    #           uses: actions/setup-go@v5
-    #           with:
-    #               go-version: 1.22
+        steps:
+            - name: Setup Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: 1.22
 
-    #         - name: Checkout Go Library Repository
-    #           uses: actions/checkout@v4
-    #           with:
-    #               repository: sonatype-nexus-community/nexus-repo-api-client-go
-    #               ref: main
-    #               token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
-    #               path: out/go
+            - name: Checkout Go Library Repository
+              uses: actions/checkout@v4
+              with:
+                  repository: sonatype-nexus-community/ossindex-api-client-go
+                  ref: main
+                  token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
+                  path: out/go
 
-    #         - name: Setup git config
-    #           run: |
-    #               git config --global user.name "GitHub Actions"
-    #               git config --global user.email "<>"
+            - name: Setup git config
+              run: |
+                  git config --global user.name "GitHub Actions"
+                  git config --global user.email "<>"
 
-    #         - name: Unstage all existing files
-    #           run: git rm -fr --ignore-unmatch *
-    #           working-directory: out/go
+            - name: Unstage all existing files
+              run: git rm -fr --ignore-unmatch *
+              working-directory: out/go
 
-    #         - name: Get generated code from cache
-    #           uses: actions/cache/restore@v4
-    #           with:
-    #               path: out/go
-    #               key: 'go-${{ github.sha }}'
-    #               fail-on-cache-miss: true
-    #         - name: Validate Checked Out Library
-    #           run: ls -lR ${{ github.workspace }}
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: out/go
+                  key: 'go-${{ github.sha }}'
+                  fail-on-cache-miss: true
+            - name: Validate Checked Out Library
+              run: ls -lR ${{ github.workspace }}
               
-    #         - name: Build Go API Client
-    #           run: go build -v ./
-    #           working-directory: out/go
+            - name: Build Go API Client
+              run: go build -v ./
+              working-directory: out/go
 
-    #         - name: Install test dependencies & run generated tests
-    #           run: |
-    #               go get github.com/stretchr/testify/assert
-    #               go test -v ./test/
-    #           working-directory: out/go
+            - name: Install test dependencies & run generated tests
+              run: |
+                  go get github.com/stretchr/testify/assert
+                  go test -v ./test/
+              working-directory: out/go
 
-    #         - name: Commit, Tag and Push
-    #           if: ${{ github.ref_type == 'tag' }}
-    #           run: |
-    #               echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
-    #               git add *
-    #               git commit -m "Automated Release v${{ env.THIS_VERSION }}"
-    #               git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
-    #               git push
-    #               git push --tags
-    #           working-directory: out/go
+            - name: Commit, Tag and Push
+              if: ${{ github.ref_type == 'tag' }}
+              run: |
+                  echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
+                  git add *
+                  git commit -m "Automated Release v${{ env.THIS_VERSION }}"
+                  git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
+                  git push
+                  git push --tags
+              working-directory: out/go
 
     # release-java-webclient:
     #     name: Release Java Webclient Library

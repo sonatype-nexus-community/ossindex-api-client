@@ -32,7 +32,8 @@ This repository produces generated API Clients in various languages and framewor
 
 | Language / Framework | Since | Public Package Link |
 | -------------------- | ---------------------- | ------------------- |
-| Python | 2025-11-15 | [![PyPI - Version](https://img.shields.io/pypi/v/ossindex-api-client)](https://pypi.org/project/ossindex-api-client/) | 
+| Go | 2025-01-15 | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/ossindex-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/ossindex-api-client-go) |
+| Python | 2024-11-15 | [![PyPI - Version](https://img.shields.io/pypi/v/ossindex-api-client)](https://pypi.org/project/ossindex-api-client/) | 
 | Typescript (fetch)   | 2023-05-22 | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fossindex-api-client)](https://www.npmjs.com/package/@sonatype/ossindex-api-client) |
 
 ## Known Issues
